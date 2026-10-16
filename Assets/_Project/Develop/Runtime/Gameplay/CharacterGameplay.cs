@@ -11,6 +11,7 @@ namespace Assets._Project.Develop.Runtime.Gameplay
         private DIContainer _container;
         private EntitiesFactory _entitiesFactory;
         private Entity _entity;
+        private Entity _teleportingCharacterEntity;
 
         private bool _isRunning;
 
@@ -33,6 +34,8 @@ namespace Assets._Project.Develop.Runtime.Gameplay
                     break;
             }
 
+            _teleportingCharacterEntity = _entitiesFactory.CreateTeleportingCharacter(Vector3.zero + Vector3.forward * 2);
+
             _isRunning = true;
         }
 
@@ -44,6 +47,12 @@ namespace Assets._Project.Develop.Runtime.Gameplay
             Vector3 input = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
 
             _entity.MoveDirection.Value = input;
+
+            if (Input.GetKeyDown(KeyCode.K))
+            {
+                _teleportingCharacterEntity.CurrentHealth.Value -= 50;
+                Debug.Log(_teleportingCharacterEntity.CurrentHealth.Value);
+            }
         }
 
         private enum CharacterType

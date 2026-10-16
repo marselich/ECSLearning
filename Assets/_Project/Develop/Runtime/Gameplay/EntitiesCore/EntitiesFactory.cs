@@ -2,6 +2,7 @@
 using Assets._Project.Develop.Runtime.Gameplay.Features.LifeCycle;
 using Assets._Project.Develop.Runtime.Gameplay.Features.MovementFeature;
 using Assets._Project.Develop.Runtime.Gameplay.Features.RotationFeature;
+using Assets._Project.Develop.Runtime.Gameplay.Features.Teleporting;
 using Assets._Project.Develop.Runtime.Infrastructure.DI;
 using Assets._Project.Develop.Runtime.Utilities.Conditions;
 using Assets._Project.Develop.Runtime.Utilities.Reactive;
@@ -34,7 +35,11 @@ namespace Assets._Project.Develop.Runtime.Gameplay.EntitiesCore
                 .AddIsDead()
                 .AddInDeathProcess()
                 .AddDeathProcessInitialTime(new ReactiveVariable<float>(0))
-                .AddDeathProcessCurrentTime();
+                .AddDeathProcessCurrentTime()
+                .AddTeleportingRadius(new ReactiveVariable<float>(2))
+                .AddIsTeleporting()
+                .AddTeleportProcessInitialTime(new ReactiveVariable<float>(1))
+                .AddTeleportProcessCurrentTime();
 
             ICompositeCondition mustDie = new CompositeCondition()
                 .Add(new FuncCondition(() => entity.CurrentHealth.Value <= 0));
@@ -48,6 +53,7 @@ namespace Assets._Project.Develop.Runtime.Gameplay.EntitiesCore
                 .AddMustSelfRelease(mustSelfRelease);
 
             entity
+                .AddSystem(new TeleportingSystem())
                 .AddSystem(new DeathSystem())
                 .AddSystem(new DisableCollidersOnDeathSystem())
                 .AddSystem(new DeathProcessTimerSystem())

@@ -1,5 +1,6 @@
 ﻿using Assets._Project.Develop.Runtime.Gameplay.EntitiesCore;
 using Assets._Project.Develop.Runtime.Gameplay.EntitiesCore.Systems;
+using Assets._Project.Develop.Runtime.Utilities.Conditions;
 using Assets._Project.Develop.Runtime.Utilities.Reactive;
 using System;
 using UnityEngine;
@@ -7,12 +8,11 @@ using Random = UnityEngine.Random;
 
 namespace Assets._Project.Develop.Runtime.Gameplay.Features.Teleporting
 {
-    public class TeleportingSystem : IInitializableSystem, IUpdatableSystem, IDisposable
+    public class TeleportingSystem : IInitializableSystem, IDisposable
     {
         private ReactiveVariable<float> _radius;
-        private ReactiveVariable<float> _currentTime;
-        private ReactiveVariable<float> _initialTime;
         private ReactiveVariable<bool> _isTeleporting;
+        private ICompositeCondition _canTeleport;
         private Rigidbody _rigidbody;
 
         private IDisposable _isTeleportingDisposable;
@@ -20,23 +20,11 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Features.Teleporting
         public void OnInit(Entity entity)
         {
             _radius = entity.TeleportingRadius;
-            _currentTime = entity.TeleportProcessCurrentTime;
-            _initialTime = entity.TeleportProcessInitialTime;
             _isTeleporting = entity.IsTeleporting;
             _rigidbody = entity.Rigidbody;
+            _canTeleport = entity.CanTeleport;
 
             _isTeleportingDisposable = _isTeleporting.Subscribe(OnTeleporting);
-        }
-
-        public void OnUpdate(float deltaTime)
-        {
-            if (_isTeleporting.Value)
-                return;
-
-            _currentTime.Value += deltaTime;
-
-            if (CooldownIsOver())
-                _isTeleporting.Value = true;
         }
 
         public void Dispose()
@@ -46,11 +34,16 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Features.Teleporting
 
         private void OnTeleporting(bool arg1, bool isTeleporting)
         {
-            if (isTeleporting)
+            if (_canTeleport.Evaluate() == false)
+            {
+                _isTeleporting.Value = false;
+                return;
+            }
+
+            if (isTeleporting && _canTeleport.Evaluate())
             {
                 Teleport();
                 _isTeleporting.Value = false;
-                _currentTime.Value = 0;
             }
         }
 
@@ -62,7 +55,5 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Features.Teleporting
 
             _rigidbody.position = targetPosition;
         }
-
-        private bool CooldownIsOver() => _currentTime.Value >= _initialTime.Value;
     }
 }

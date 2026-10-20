@@ -22,7 +22,7 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Features.MovementFeature
         {
             Vector3 velocity = _moveDirection.Value.normalized * _moveSpeed.Value;
 
-            Debug.Log("Применяемая скорость: " + velocity.ToString());
+            //Debug.Log("Применяемая скорость: " + velocity.ToString());
 
             _rigidbody.velocity = velocity;
         }

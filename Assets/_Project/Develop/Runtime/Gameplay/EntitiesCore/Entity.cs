@@ -15,6 +15,8 @@ namespace Assets._Project.Develop.Runtime.Gameplay.EntitiesCore
 
         private bool _isInit;
 
+        public bool IsInit => _isInit;
+
         public void Initialize()
         {
             foreach (IInitializableSystem initializable in _initializables)

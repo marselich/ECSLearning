@@ -1,5 +1,7 @@
 ﻿using Assets._Project.Develop.Runtime.Gameplay.EntitiesCore;
 using Assets._Project.Develop.Runtime.Gameplay.EntitiesCore.Mono;
+using Assets._Project.Develop.Runtime.Gameplay.Features.AI;
+using Assets._Project.Develop.Runtime.Gameplay.Features.InputFeature;
 using Assets._Project.Develop.Runtime.Infrastructure.DI;
 using Assets._Project.Develop.Runtime.Utilities.AssetsManagment;
 
@@ -10,10 +12,28 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Infrastructure
         public static void Process(DIContainer c, GameplayInputArgs args)
         {
             c.RegisterAsSingle<EntitiesFactory>(CreateEntitiesFactory);
+
             c.RegisterAsSingle<EntitiesLifeContext>(CreateEntitiesLifeContext);
+
             c.RegisterAsSingle<MonoEntitiesFactory>(CreateMonoEntitiesFactory).NonLazy();
+
             c.RegisterAsSingle<CollidersRegistryService>(CreateCollidersRegistryService);
+
+            c.RegisterAsSingle<BrainsFactory>(CreateBrainsFactory);
+
+            c.RegisterAsSingle<AIBrainsContext>(CreateAIBrainsContext);
+
+            c.RegisterAsSingle<IInputService>(CreateDesktopInput);
         }
+
+        private static DesktopInput CreateDesktopInput(DIContainer c)
+            => new DesktopInput();
+
+        private static AIBrainsContext CreateAIBrainsContext(DIContainer c)
+            => new AIBrainsContext();
+
+        private static BrainsFactory CreateBrainsFactory(DIContainer c)
+            => new BrainsFactory(c);
 
         private static EntitiesLifeContext CreateEntitiesLifeContext(DIContainer c)
             => new EntitiesLifeContext();

@@ -8,6 +8,9 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Features.InputFeature
         private const string VerticalAxisName = "Vertical";
 
         public bool IsEnabled { get; set; } = true;
+        public float MouseHorizontal => IsEnabled ? Input.GetAxisRaw("Mouse X") : 0;
+        public bool AttackPressed => IsEnabled && Input.GetMouseButtonDown(0);
+        public bool MainMenuPressed => IsEnabled && Input.GetKeyDown(KeyCode.F);
 
         public Vector3 Direction
         {

@@ -1,16 +1,15 @@
-﻿using Assets._Project.Develop.Runtime.Gameplay.EntitiesCore;
+using Assets._Project.Develop.Runtime.Gameplay.EntitiesCore;
 using Assets._Project.Develop.Runtime.Gameplay.EntitiesCore.Systems;
 using Assets._Project.Develop.Runtime.Utilities.Conditions;
 using Assets._Project.Develop.Runtime.Utilities.Reactive;
 using System;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 namespace Assets._Project.Develop.Runtime.Gameplay.Features.Teleporting
 {
     public class TeleportingSystem : IInitializableSystem, IDisposable
     {
-        private ReactiveVariable<float> _radius;
+        private ReactiveVariable<Vector3> _destination;
         private ReactiveVariable<bool> _isTeleporting;
         private ICompositeCondition _canTeleport;
         private Rigidbody _rigidbody;
@@ -19,7 +18,7 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Features.Teleporting
 
         public void OnInit(Entity entity)
         {
-            _radius = entity.TeleportingRadius;
+            _destination = entity.TeleportDestination;
             _isTeleporting = entity.IsTeleporting;
             _rigidbody = entity.Rigidbody;
             _canTeleport = entity.CanTeleport;
@@ -34,6 +33,9 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Features.Teleporting
 
         private void OnTeleporting(bool arg1, bool isTeleporting)
         {
+            if (isTeleporting == false)
+                return;
+
             if (_canTeleport.Evaluate() == false)
             {
                 _isTeleporting.Value = false;
@@ -49,11 +51,7 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Features.Teleporting
 
         private void Teleport()
         {
-            Vector2 direction = Random.insideUnitCircle.normalized * _radius.Value;
-
-            Vector3 targetPosition = _rigidbody.position + new Vector3(direction.x, _rigidbody.position.y, direction.y);
-
-            _rigidbody.position = targetPosition;
+            _rigidbody.position = _destination.Value;
         }
     }
 }

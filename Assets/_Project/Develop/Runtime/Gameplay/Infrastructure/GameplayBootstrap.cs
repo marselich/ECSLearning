@@ -1,4 +1,6 @@
-﻿using Assets._Project.Develop.Runtime.Gameplay.EntitiesCore;
+using Assets._Project.Develop.Runtime.Gameplay.EntitiesCore;
+using Assets._Project.Develop.Runtime.Gameplay.Features.AI;
+using Assets._Project.Develop.Runtime.Gameplay.Features.InputFeature;
 using Assets._Project.Develop.Runtime.Infrastructure;
 using Assets._Project.Develop.Runtime.Infrastructure.DI;
 using Assets._Project.Develop.Runtime.Utilities.CoroutinesManagment;
@@ -18,6 +20,7 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Infrastructure
         private GameplayInputArgs _inputArgs;
 
         private EntitiesLifeContext _entitiesLifeContext;
+        private AIBrainsContext _brainsContext;
 
         public override void ProcessRegistrations(DIContainer container, IInputSceneArgs sceneArgs = null)
         {
@@ -36,6 +39,7 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Infrastructure
             Debug.Log($"Вы попали на уровень {_inputArgs.LevelNumber}");
 
             _entitiesLifeContext = _container.Resolve<EntitiesLifeContext>();
+            _brainsContext = _container.Resolve<AIBrainsContext>();
 
             _characterGameplay.Initialize(_container);
 
@@ -52,8 +56,9 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Infrastructure
         private void Update()
         {
             _entitiesLifeContext?.Update(Time.deltaTime);
+            _brainsContext?.Update(Time.deltaTime);
 
-            if (Input.GetKeyDown(KeyCode.F))
+            if (_container.Resolve<IInputService>().MainMenuPressed)
             {
                 ICoroutinesPerformer coroutinesPerformer = _container.Resolve<ICoroutinesPerformer>();
                 SceneSwitcherService sceneSwitcherService = _container.Resolve<SceneSwitcherService>();

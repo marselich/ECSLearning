@@ -4,6 +4,7 @@ using Assets._Project.Develop.Runtime.Utilities.ConfigsManagment;
 using Assets._Project.Develop.Runtime.Utilities.CoroutinesManagment;
 using Assets._Project.Develop.Runtime.Utilities.LoadingScreen;
 using Assets._Project.Develop.Runtime.Utilities.SceneManagment;
+using Assets._Project.Develop.Runtime.Utilities.Timer;
 using Object = UnityEngine.Object;
 
 namespace Assets._Project.Develop.Runtime.Infrastructure.EntryPoint
@@ -23,7 +24,12 @@ namespace Assets._Project.Develop.Runtime.Infrastructure.EntryPoint
             c.RegisterAsSingle<ILoadingScreen>(CreateStandartLoadingScreen);
 
             c.RegisterAsSingle<SceneSwitcherService>(CreateSceneSwitcherService);
+
+            c.RegisterAsSingle<TimerServiceFactory>(CreateTimerServiceFactory);
         }
+
+        private static TimerServiceFactory CreateTimerServiceFactory(DIContainer c)
+            => new TimerServiceFactory(c);
 
         private static ConfigsProviderService CreateConfigsProviderService(DIContainer c)
         {

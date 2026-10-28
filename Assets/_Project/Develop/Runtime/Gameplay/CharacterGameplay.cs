@@ -1,4 +1,6 @@
-﻿using Assets._Project.Develop.Runtime.Gameplay.EntitiesCore;
+using Assets._Project.Develop.Runtime.Gameplay.EntitiesCore;
+using Assets._Project.Develop.Runtime.Gameplay.Features.AI;
+using Assets._Project.Develop.Runtime.Gameplay.Features.AI.States;
 using Assets._Project.Develop.Runtime.Infrastructure.DI;
 using UnityEngine;
 
@@ -10,6 +12,7 @@ namespace Assets._Project.Develop.Runtime.Gameplay
 
         private DIContainer _container;
         private EntitiesFactory _entitiesFactory;
+        private BrainsFactory _brainsFactory;
         private Entity _entity;
         private Entity _teleportingCharacterEntity;
 
@@ -19,6 +22,7 @@ namespace Assets._Project.Develop.Runtime.Gameplay
         {
             _container = container;
             _entitiesFactory = container.Resolve<EntitiesFactory>();
+            _brainsFactory = container.Resolve<BrainsFactory>();
         }
 
         public void Run()
@@ -35,6 +39,9 @@ namespace Assets._Project.Develop.Runtime.Gameplay
             }
 
             _teleportingCharacterEntity = _entitiesFactory.CreateTeleportingCharacter(Vector3.zero + Vector3.forward * 2);
+            _brainsFactory.CreateTeleportingCharacterBrain(
+                _teleportingCharacterEntity,
+                new LowestHealthTargetSelector(_teleportingCharacterEntity));
 
             _isRunning = true;
         }
@@ -43,10 +50,6 @@ namespace Assets._Project.Develop.Runtime.Gameplay
         {
             if (_isRunning == false)
                 return;
-
-            Vector3 input = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
-
-            _entity.MoveDirection.Value = input;
 
             if (Input.GetKeyDown(KeyCode.K))
             {

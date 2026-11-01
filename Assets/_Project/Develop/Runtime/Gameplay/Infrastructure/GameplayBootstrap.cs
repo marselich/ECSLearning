@@ -22,6 +22,8 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Infrastructure
         private EntitiesLifeContext _entitiesLifeContext;
         private AIBrainsContext _brainsContext;
 
+        private bool _isRunning;
+
         public override void ProcessRegistrations(DIContainer container, IInputSceneArgs sceneArgs = null)
         {
             _container = container;
@@ -50,11 +52,16 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Infrastructure
         {
             _characterGameplay.Run();
 
+            _isRunning = true;
+
             yield break;
         }
 
         private void Update()
         {
+            if (_isRunning == false)
+                return;
+
             _entitiesLifeContext?.Update(Time.deltaTime);
             _brainsContext?.Update(Time.deltaTime);
 

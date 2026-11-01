@@ -2,10 +2,9 @@ using Assets._Project.Develop.Runtime.Gameplay.EntitiesCore;
 using Assets._Project.Develop.Runtime.Gameplay.Features.AI.States;
 using Assets._Project.Develop.Runtime.Gameplay.Features.InputFeature;
 using Assets._Project.Develop.Runtime.Infrastructure.DI;
-using Assets._Project.Develop.Runtime.Utilities.StateMachineCore;
-using Assets._Project.Develop.Runtime.Utilities.Timer;
-using Assets._Project.Develop.Runtime.Utilities.Reactive;
 using Assets._Project.Develop.Runtime.Utilities.Conditions;
+using Assets._Project.Develop.Runtime.Utilities.Reactive;
+using Assets._Project.Develop.Runtime.Utilities.Timer;
 
 namespace Assets._Project.Develop.Runtime.Gameplay.Features.AI
 {
@@ -34,6 +33,7 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Features.AI
 
             ICompositeCondition fromRandomToTarget = new CompositeCondition()
                 .Add(new FuncCondition(() => currentTarget.Value != null));
+
             ICompositeCondition fromTargetToRandom = new CompositeCondition()
                 .Add(new FuncCondition(() => currentTarget.Value == null));
 
@@ -43,7 +43,7 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Features.AI
             behaviour.AddTransition(randomState, targetState, fromRandomToTarget);
             behaviour.AddTransition(targetState, randomState, fromTargetToRandom);
 
-            FindTargetState findTargetState = new FindTargetState(targetSelector, entity);
+            FindTargetState findTargetState = new FindTargetState(targetSelector, _entitiesLifeContext, entity);
             AIParallelState parallelState = new AIParallelState(findTargetState, behaviour);
             AIStateMachine rootStateMachine = new AIStateMachine();
             rootStateMachine.AddState(parallelState);

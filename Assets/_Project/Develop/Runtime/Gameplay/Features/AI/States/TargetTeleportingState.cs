@@ -1,10 +1,8 @@
-using Assets._Project.Develop.Runtime.Gameplay.Common;
 using Assets._Project.Develop.Runtime.Gameplay.EntitiesCore;
-using Assets._Project.Develop.Runtime.Gameplay.Features.LifeCycle;
-using Assets._Project.Develop.Runtime.Utilities.StateMachineCore;
-using UnityEngine;
 using Assets._Project.Develop.Runtime.Utilities.Conditions;
 using Assets._Project.Develop.Runtime.Utilities.Reactive;
+using Assets._Project.Develop.Runtime.Utilities.StateMachineCore;
+using UnityEngine;
 
 namespace Assets._Project.Develop.Runtime.Gameplay.Features.AI.States
 {
@@ -23,7 +21,7 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Features.AI.States
         private readonly Rigidbody _rigidbody;
         private readonly ReactiveVariable<Vector3> _teleportDestination;
         private readonly ReactiveVariable<float> _teleportingRadius;
-        private readonly ReactiveVariable<float> _teleportInterval;
+        private readonly ReactiveVariable<float> _targetTeleportInterval;
         private readonly ReactiveVariable<float> _elapsedTime = new();
 
         public TargetTeleportingState(Entity entity)
@@ -39,7 +37,7 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Features.AI.States
             _rigidbody = entity.Rigidbody;
             _teleportDestination = entity.TeleportDestination;
             _teleportingRadius = entity.TeleportingRadius;
-            _teleportInterval = entity.TeleportInterval;
+            _targetTeleportInterval = entity.TargetTeleportInterval;
         }
 
         public override void Enter()
@@ -53,9 +51,9 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Features.AI.States
             if (_entity.IsInit == false || _isDead.Value || _currentHealth.Value <= 0)
                 return;
 
-            _elapsedTime.Value = Mathf.Min(_elapsedTime.Value + deltaTime, _teleportInterval.Value);
+            _elapsedTime.Value = Mathf.Min(_elapsedTime.Value + deltaTime, _targetTeleportInterval.Value);
 
-            if (_elapsedTime.Value < _teleportInterval.Value || _isTeleporting.Value
+            if (_elapsedTime.Value < _targetTeleportInterval.Value || _isTeleporting.Value
                 || _canTeleport.Evaluate() == false || _teleportingRadius.Value <= 0)
                 return;
 
@@ -63,19 +61,16 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Features.AI.States
                 return;
 
             Entity target = _currentTarget.Value;
+
             if (target == null)
                 return;
 
             Vector3 offset = target.Transform.position - _rigidbody.position;
             offset.y = 0;
-            if (offset.sqrMagnitude <= Mathf.Epsilon)
-                return;
 
-            _teleportDestination.Value = _rigidbody.position
-                + Vector3.ClampMagnitude(offset, _teleportingRadius.Value);
+            _teleportDestination.Value = _rigidbody.position + Vector3.ClampMagnitude(offset, _teleportingRadius.Value);
             _isTeleporting.Value = true;
             _elapsedTime.Value = 0;
         }
-
     }
 }

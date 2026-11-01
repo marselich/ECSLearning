@@ -30,6 +30,34 @@ namespace Assets._Project.Develop.Runtime.Gameplay.EntitiesCore
 			return AddComponent(new Assets._Project.Develop.Runtime.Gameplay.Features.Teleporting.TeleportInterval() {Value = value}); 
 		}
 
+		public Assets._Project.Develop.Runtime.Gameplay.Features.Teleporting.TargetTeleportInterval TargetTeleportIntervalC => GetComponent<Assets._Project.Develop.Runtime.Gameplay.Features.Teleporting.TargetTeleportInterval>();
+
+		public Assets._Project.Develop.Runtime.Utilities.Reactive.ReactiveVariable<System.Single> TargetTeleportInterval => TargetTeleportIntervalC.Value;
+
+		public Assets._Project.Develop.Runtime.Gameplay.EntitiesCore.Entity AddTargetTeleportInterval()
+		{
+			return AddComponent(new Assets._Project.Develop.Runtime.Gameplay.Features.Teleporting.TargetTeleportInterval() { Value = new Assets._Project.Develop.Runtime.Utilities.Reactive.ReactiveVariable<System.Single>() }); 
+		}
+
+		public Assets._Project.Develop.Runtime.Gameplay.EntitiesCore.Entity AddTargetTeleportInterval(Assets._Project.Develop.Runtime.Utilities.Reactive.ReactiveVariable<System.Single> value)
+		{
+			return AddComponent(new Assets._Project.Develop.Runtime.Gameplay.Features.Teleporting.TargetTeleportInterval() {Value = value}); 
+		}
+
+		public Assets._Project.Develop.Runtime.Gameplay.Features.Teleporting.TargetDetectionRadius TargetDetectionRadiusC => GetComponent<Assets._Project.Develop.Runtime.Gameplay.Features.Teleporting.TargetDetectionRadius>();
+
+		public Assets._Project.Develop.Runtime.Utilities.Reactive.ReactiveVariable<System.Single> TargetDetectionRadius => TargetDetectionRadiusC.Value;
+
+		public Assets._Project.Develop.Runtime.Gameplay.EntitiesCore.Entity AddTargetDetectionRadius()
+		{
+			return AddComponent(new Assets._Project.Develop.Runtime.Gameplay.Features.Teleporting.TargetDetectionRadius() { Value = new Assets._Project.Develop.Runtime.Utilities.Reactive.ReactiveVariable<System.Single>() }); 
+		}
+
+		public Assets._Project.Develop.Runtime.Gameplay.EntitiesCore.Entity AddTargetDetectionRadius(Assets._Project.Develop.Runtime.Utilities.Reactive.ReactiveVariable<System.Single> value)
+		{
+			return AddComponent(new Assets._Project.Develop.Runtime.Gameplay.Features.Teleporting.TargetDetectionRadius() {Value = value}); 
+		}
+
 		public Assets._Project.Develop.Runtime.Gameplay.Features.Teleporting.TeleportDestination TeleportDestinationC => GetComponent<Assets._Project.Develop.Runtime.Gameplay.Features.Teleporting.TeleportDestination>();
 
 		public Assets._Project.Develop.Runtime.Utilities.Reactive.ReactiveVariable<UnityEngine.Vector3> TeleportDestination => TeleportDestinationC.Value;

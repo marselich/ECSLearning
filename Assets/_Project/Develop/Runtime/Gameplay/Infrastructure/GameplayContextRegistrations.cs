@@ -1,7 +1,6 @@
 ﻿using Assets._Project.Develop.Runtime.Gameplay.EntitiesCore;
 using Assets._Project.Develop.Runtime.Gameplay.EntitiesCore.Mono;
 using Assets._Project.Develop.Runtime.Gameplay.Features.AI;
-using Assets._Project.Develop.Runtime.Gameplay.Features.InputFeature;
 using Assets._Project.Develop.Runtime.Infrastructure.DI;
 using Assets._Project.Develop.Runtime.Utilities.AssetsManagment;
 
@@ -22,12 +21,7 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Infrastructure
             c.RegisterAsSingle<BrainsFactory>(CreateBrainsFactory);
 
             c.RegisterAsSingle<AIBrainsContext>(CreateAIBrainsContext);
-
-            c.RegisterAsSingle<IInputService>(CreateDesktopInput);
         }
-
-        private static DesktopInput CreateDesktopInput(DIContainer c)
-            => new DesktopInput();
 
         private static AIBrainsContext CreateAIBrainsContext(DIContainer c)
             => new AIBrainsContext();

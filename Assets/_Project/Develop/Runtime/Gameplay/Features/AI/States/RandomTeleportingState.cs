@@ -1,8 +1,8 @@
 using Assets._Project.Develop.Runtime.Gameplay.EntitiesCore;
-using Assets._Project.Develop.Runtime.Utilities.StateMachineCore;
-using UnityEngine;
 using Assets._Project.Develop.Runtime.Utilities.Conditions;
 using Assets._Project.Develop.Runtime.Utilities.Reactive;
+using Assets._Project.Develop.Runtime.Utilities.StateMachineCore;
+using UnityEngine;
 
 namespace Assets._Project.Develop.Runtime.Gameplay.Features.AI.States
 {
@@ -34,8 +34,9 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Features.AI.States
 
         public override void Enter()
         {
-            _elapsedTime.Value = 0;
             base.Enter();
+
+            _elapsedTime.Value = 0;
         }
 
         public void Update(float deltaTime)
@@ -50,8 +51,11 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Features.AI.States
                 return;
 
             Vector2 offset = Random.insideUnitCircle * _teleportingRadius.Value;
+
             _teleportDestination.Value = _rigidbody.position + new Vector3(offset.x, 0, offset.y);
+
             _isTeleporting.Value = true;
+
             _elapsedTime.Value = 0;
         }
     }

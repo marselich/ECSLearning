@@ -1,4 +1,5 @@
-﻿using Assets._Project.Develop.Runtime.Infrastructure.DI;
+﻿using Assets._Project.Develop.Runtime.Gameplay.Features.InputFeature;
+using Assets._Project.Develop.Runtime.Infrastructure.DI;
 using Assets._Project.Develop.Runtime.Utilities.AssetsManagment;
 using Assets._Project.Develop.Runtime.Utilities.ConfigsManagment;
 using Assets._Project.Develop.Runtime.Utilities.CoroutinesManagment;
@@ -26,7 +27,12 @@ namespace Assets._Project.Develop.Runtime.Infrastructure.EntryPoint
             c.RegisterAsSingle<SceneSwitcherService>(CreateSceneSwitcherService);
 
             c.RegisterAsSingle<TimerServiceFactory>(CreateTimerServiceFactory);
+
+            c.RegisterAsSingle<IInputService>(CreateDesktopInput);
         }
+
+        private static DesktopInput CreateDesktopInput(DIContainer c)
+            => new DesktopInput();
 
         private static TimerServiceFactory CreateTimerServiceFactory(DIContainer c)
             => new TimerServiceFactory(c);

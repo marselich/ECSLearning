@@ -1,6 +1,7 @@
 using Assets._Project.Develop.Runtime.Gameplay.EntitiesCore;
 using Assets._Project.Develop.Runtime.Utilities.Conditions;
 using Assets._Project.Develop.Runtime.Utilities.Reactive;
+using UnityEngine;
 
 namespace Assets._Project.Develop.Runtime.Gameplay.Features.Teleporting
 {
@@ -14,9 +15,19 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Features.Teleporting
         public ReactiveVariable<float> Value;
     }
 
+    public class TargetTeleportInterval : IEntityComponent
+    {
+        public ReactiveVariable<float> Value;
+    }
+
+    public class TargetDetectionRadius : IEntityComponent
+    {
+        public ReactiveVariable<float> Value;
+    }
+
     public class TeleportDestination : IEntityComponent
     {
-        public ReactiveVariable<UnityEngine.Vector3> Value;
+        public ReactiveVariable<Vector3> Value;
     }
 
     public class IsTeleporting : IEntityComponent

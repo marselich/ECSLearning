@@ -12,10 +12,12 @@ namespace Assets._Project.Develop.Runtime.Utilities.StateMachineCore
         private StateNode<TState> _currentState;
 
         private List<IDisposable> _disposables;
+        private readonly bool _resetOnExit;
 
-        protected StateMachine(List<IDisposable> disposables)
+        protected StateMachine(List<IDisposable> disposables, bool resetOnExit = false)
         {
             _disposables = new List<IDisposable>();
+            _resetOnExit = resetOnExit;
         }
 
         private bool _isRunning;
@@ -84,6 +86,9 @@ namespace Assets._Project.Develop.Runtime.Utilities.StateMachineCore
             base.Exit();
 
             _currentState?.State.Exit();
+
+            if (_resetOnExit)
+                _currentState = null;
 
             _isRunning = false;
         }

@@ -5,7 +5,6 @@ using Assets._Project.Develop.Runtime.Gameplay.Features.Attack;
 using Assets._Project.Develop.Runtime.Gameplay.Features.Attack.Shoot;
 using Assets._Project.Develop.Runtime.Gameplay.Features.ContactTakeDamage;
 using Assets._Project.Develop.Runtime.Gameplay.Features.Energy;
-using Assets._Project.Develop.Runtime.Gameplay.Features.InputFeature;
 using Assets._Project.Develop.Runtime.Gameplay.Features.LifeCycle;
 using Assets._Project.Develop.Runtime.Gameplay.Features.MovementFeature;
 using Assets._Project.Develop.Runtime.Gameplay.Features.RotationFeature;
@@ -22,14 +21,12 @@ namespace Assets._Project.Develop.Runtime.Gameplay.EntitiesCore
 {
     public class EntitiesFactory
     {
-        private readonly DIContainer _container;
         private readonly EntitiesLifeContext _lifeContext;
         private readonly MonoEntitiesFactory _monoEntitiesFactory;
         private readonly CollidersRegistryService _collidersRegistryService;
 
         public EntitiesFactory(DIContainer container)
         {
-            _container = container;
             _lifeContext = container.Resolve<EntitiesLifeContext>();
             _monoEntitiesFactory = container.Resolve<MonoEntitiesFactory>();
             _collidersRegistryService = container.Resolve<CollidersRegistryService>();
@@ -133,17 +130,6 @@ namespace Assets._Project.Develop.Runtime.Gameplay.EntitiesCore
         {
             entity
                 .AddRotationDirection(new ReactiveVariable<Vector3>(entity.Transform.forward))
-                .AddComponent(new MouseSensitivity { Value = new ReactiveVariable<float>(5f) })
-                .AddStartAttackRequest()
-                .AddStartAttackEvent()
-                .AddEndAttackEvent()
-                .AddInAttackProcess()
-                .AddAttackProcessInitialTime(new ReactiveVariable<float>(0.6f))
-                .AddAttackProcessCurrentTime()
-                .AddAttackDelayTime(new ReactiveVariable<float>(0.2f))
-                .AddAttackDelayEndEvent()
-                .AddInstantAttackDamage(new ReactiveVariable<float>(50f))
-                .AddAttackCanceledEvent()
                 .AddMoveDirection()
                 .AddMoveSpeed(new ReactiveVariable<float>() { Value = 10 })
                 .AddRotationSpeed(new ReactiveVariable<float>() { Value = 900 })
@@ -167,38 +153,21 @@ namespace Assets._Project.Develop.Runtime.Gameplay.EntitiesCore
                 .Add(new FuncCondition(() => entity.IsDead.Value == false));
 
             ICompositeCondition canMove = new CompositeCondition()
-                .Add(new FuncCondition(() => !entity.IsDead.Value && entity.CurrentHealth.Value > 0));
+                .Add(new FuncCondition(() => entity.IsDead.Value == false))
+                .Add(new FuncCondition(() => entity.CurrentHealth.Value > 0));
 
             ICompositeCondition canRotate = new CompositeCondition()
-                .Add(new FuncCondition(() => !entity.IsDead.Value && entity.CurrentHealth.Value > 0))
-                .Add(new FuncCondition(() => !entity.InAttackProcess.Value));
-
-            ICompositeCondition canStartAttack = new CompositeCondition()
-                .Add(new FuncCondition(() => !entity.IsDead.Value && entity.CurrentHealth.Value > 0))
-                .Add(new FuncCondition(() => entity.MoveDirection.Value.sqrMagnitude == 0))
-                .Add(new FuncCondition(() => !entity.InAttackProcess.Value));
-
-            ICompositeCondition mustCancelAttack = new CompositeCondition(LogicOperations.Or)
-                .Add(new FuncCondition(() => entity.MoveDirection.Value.sqrMagnitude > 0))
-                .Add(new FuncCondition(() => entity.IsDead.Value || entity.CurrentHealth.Value <= 0));
+                .Add(new FuncCondition(() => entity.IsDead.Value == false))
+                .Add(new FuncCondition(() => entity.CurrentHealth.Value > 0));
 
             entity
                 .AddCanMove(canMove)
                 .AddCanRotate(canRotate)
-                .AddCanStartAttack(canStartAttack)
-                .AddMustCancelAttack(mustCancelAttack)
                 .AddMustDie(mustDie)
                 .AddMustSelfRelease(mustSelfRelease)
                 .AddCanApplyDamage(canApplyDamage);
 
             entity
-                .AddSystem(new PlayerControlSystem(_container.Resolve<IInputService>()))
-                .AddSystem(new StartAttackSystem())
-                .AddSystem(new AttackCancelSystem())
-                .AddSystem(new AttackDelayEndTriggerSystem())
-                .AddSystem(new InstantShootSystem(this))
-                .AddSystem(new EndAttackSystem())
-                .AddSystem(new AttackProcessTimerSystem())
                 .AddSystem(new ApplyDamageSystem())
                 .AddSystem(new DeathSystem())
                 .AddSystem(new DisableCollidersOnDeathSystem())
@@ -210,6 +179,7 @@ namespace Assets._Project.Develop.Runtime.Gameplay.EntitiesCore
             else
                 entity.AddSystem(new CharacterControllerMovementSystem()).AddSystem(new TransformRotationSystem());
 
+            ConfigureManualCombat(entity);
             _lifeContext.Add(entity);
 
             return entity;
@@ -268,6 +238,52 @@ namespace Assets._Project.Develop.Runtime.Gameplay.EntitiesCore
             _lifeContext.Add(entity);
 
             return entity;
+        }
+
+        private void ConfigureManualCombat(Entity entity)
+        {
+            if (entity.HasComponent<ShootPoint>() == false)
+            {
+                Transform shootPoint = new GameObject("ShootPoint").transform;
+                shootPoint.SetParent(entity.Transform, false);
+                shootPoint.localPosition = Vector3.up + Vector3.forward;
+                entity.AddShootPoint(shootPoint);
+            }
+
+            entity
+                .AddMouseSensitivity(new ReactiveVariable<float>(5f))
+                .AddStartAttackRequest()
+                .AddStartAttackEvent()
+                .AddEndAttackEvent()
+                .AddInAttackProcess()
+                .AddAttackProcessInitialTime(new ReactiveVariable<float>(0.6f))
+                .AddAttackProcessCurrentTime()
+                .AddAttackDelayTime(new ReactiveVariable<float>(0.2f))
+                .AddAttackDelayEndEvent()
+                .AddInstantAttackDamage(new ReactiveVariable<float>(50f))
+                .AddAttackCanceledEvent();
+
+            ICompositeCondition canStartAttack = new CompositeCondition()
+                .Add(new FuncCondition(() => entity.IsDead.Value == false && entity.CurrentHealth.Value > 0))
+                .Add(new FuncCondition(() => entity.MoveDirection.Value.sqrMagnitude == 0))
+                .Add(new FuncCondition(() => entity.InAttackProcess.Value == false));
+
+            ICompositeCondition mustCancelAttack = new CompositeCondition(LogicOperations.Or)
+                .Add(new FuncCondition(() => entity.MoveDirection.Value.sqrMagnitude > 0))
+                .Add(new FuncCondition(() => entity.IsDead.Value))
+                .Add(new FuncCondition(() => entity.CurrentHealth.Value <= 0));
+
+            entity
+                .AddCanStartAttack(canStartAttack)
+                .AddMustCancelAttack(mustCancelAttack);
+
+            entity
+                .AddSystem(new StartAttackSystem())
+                .AddSystem(new AttackCancelSystem())
+                .AddSystem(new AttackDelayEndTriggerSystem())
+                .AddSystem(new InstantShootSystem(this))
+                .AddSystem(new EndAttackSystem())
+                .AddSystem(new AttackProcessTimerSystem());
         }
 
         private Entity CreateEmpty() => new Entity();

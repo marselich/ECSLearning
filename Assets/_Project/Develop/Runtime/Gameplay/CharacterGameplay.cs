@@ -1,6 +1,7 @@
 using Assets._Project.Develop.Runtime.Gameplay.EntitiesCore;
 using Assets._Project.Develop.Runtime.Gameplay.Features.AI;
 using Assets._Project.Develop.Runtime.Gameplay.Features.AI.States;
+using Assets._Project.Develop.Runtime.Gameplay.Features.InputFeature;
 using Assets._Project.Develop.Runtime.Infrastructure.DI;
 using UnityEngine;
 
@@ -10,9 +11,9 @@ namespace Assets._Project.Develop.Runtime.Gameplay
     {
         [SerializeField] private CharacterType _characterType;
 
-        private DIContainer _container;
         private EntitiesFactory _entitiesFactory;
         private BrainsFactory _brainsFactory;
+        private IInputService _input;
         private Entity _entity;
         private Entity _teleportingCharacterEntity;
 
@@ -20,9 +21,9 @@ namespace Assets._Project.Develop.Runtime.Gameplay
 
         public void Initialize(DIContainer container)
         {
-            _container = container;
             _entitiesFactory = container.Resolve<EntitiesFactory>();
             _brainsFactory = container.Resolve<BrainsFactory>();
+            _input = container.Resolve<IInputService>();
         }
 
         public void Run()
@@ -38,6 +39,8 @@ namespace Assets._Project.Develop.Runtime.Gameplay
                     break;
             }
 
+            _brainsFactory.CreateMainCharacterBrain(_entity);
+
             _teleportingCharacterEntity = _entitiesFactory.CreateTeleportingCharacter(Vector3.zero + Vector3.forward * 2);
             _brainsFactory.CreateTeleportingCharacterBrain(
                 _teleportingCharacterEntity,
@@ -51,7 +54,7 @@ namespace Assets._Project.Develop.Runtime.Gameplay
             if (_isRunning == false)
                 return;
 
-            if (Input.GetKeyDown(KeyCode.K))
+            if (_input.DebugDamagePressed)
             {
                 _teleportingCharacterEntity.CurrentHealth.Value -= 50;
                 Debug.Log(_teleportingCharacterEntity.CurrentHealth.Value);

@@ -11,6 +11,7 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Features.InputFeature
         public float MouseHorizontal => IsEnabled ? Input.GetAxisRaw("Mouse X") : 0;
         public bool AttackPressed => IsEnabled && Input.GetMouseButtonDown(0);
         public bool MainMenuPressed => IsEnabled && Input.GetKeyDown(KeyCode.F);
+        public bool DebugDamagePressed => IsEnabled && Input.GetKeyDown(KeyCode.K);
 
         public Vector3 Direction
         {

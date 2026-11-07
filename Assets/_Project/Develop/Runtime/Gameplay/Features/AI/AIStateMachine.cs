@@ -14,6 +14,10 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Features.AI
         {
         }
 
+        public AIStateMachine(bool resetOnExit) : base(new List<IDisposable>(), resetOnExit)
+        {
+        }
+
         protected override void UpdateLogic(float deltaTime)
         {
             base.UpdateLogic(deltaTime);
